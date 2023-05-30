@@ -4,7 +4,7 @@
     Update file and directory modification timestamps so that golang properly
     caches test inputs.
 
-    Go uses a combination of the size and modification time, so if the repo is
+    Go uses a combination of the size and modification time, so if a repo is
     re-cloned and we don't do something like this, then it considers all files to
     be new and won't cache any tests that read fixtures from the repo.
 

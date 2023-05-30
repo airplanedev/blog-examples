@@ -1,2 +1,4 @@
-# blog-examples
-Examples and code snippets for the Airplane blog
+# Blog examples
+
+This repo contains miscellaneous examples and code snippets that
+are referred to from the [Airplane blog](https://www.airplane.dev/blog).

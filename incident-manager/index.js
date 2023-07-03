@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { Client as notionClient } from '@notionhq/client';
 import { api as pdApi } from '@pagerduty/pdjs';
 import bolt from '@slack/bolt';
@@ -11,24 +10,42 @@ import {
   incidentResolvedNotifyBlocks,
 } from './messages.js';
 
+// API and app tokens for your app. See the README for more details (required).
 const SLACK_API_TOKEN = process.env.SLACK_API_TOKEN;
 const SLACK_APP_TOKEN = process.env.SLACK_APP_TOKEN;
+
+// The name that appears in your organization's Slack links,
+// i.e. [name].slackapp.com (required)
+const SLACK_ORG = process.env.SLACK_ORG;
+
+// Comma-separated list of user IDs who should be invited to any incident
+// channels (optional)
 const SLACK_INVITE_USERS = process.env.SLACK_INVITE_USERS;
+
+// Comma-separated list of channel IDs that should be notified about incidents
+// that occur (optional)
 const SLACK_NOTIFY_CHANNEL_IDS = process.env.SLACK_NOTIFY_CHANNEL_IDS;
+
+// Comma-separated list of group IDs that should be cc'ed from the incident
+// channel (optional)
 const SLACK_CC_GROUP_IDS = process.env.SLACK_CC_GROUP_IDS;
 
+// PagerDuty parameters.
 const PAGERDUTY_API_TOKEN = process.env.PAGERDUTY_API_TOKEN;
 const PAGERDUTY_ESCALATION_POLICY_ID =
   process.env.PAGERDUTY_ESCALATION_POLICY_ID;
 const PAGERDUTY_SERVICE_ID = process.env.PAGERDUTY_SERVICE_ID;
 
+// Notion parameters.
 const NOTION_API_KEY = process.env.NOTION_API_KEY;
 const NOTION_DB_ID = process.env.NOTION_DB_ID;
 
+// A prefix that will be used for all incident channel names.
 const INCIDENT_CHANNEL_PREFIX = 'incd-';
-const INCIDENT_DOC_URL =
-  'https://airplane.slab.com/posts/reporting-an-incident-j6ikdl7l';
-const SLACK_ORG = 'airplanedev';
+
+// A link to your organization's incident documentation. Replace the placeholder
+// here with one of your own.
+const INCIDENT_DOC_URL = 'https://google.com';
 
 // Create a new app
 const app = new bolt.App({
@@ -85,7 +102,7 @@ const createIncidentMarkdownDesc = (
 };
 
 // Create a createPagerDutyIncident incident so on-call can be informed. Returns the incident
-// URL wrapped in a promise.
+// URL wrapped in a promise. If you're not using PagerDuty, then you can delete.
 const createPagerDutyIncident = async (name, description, channelId) => {
   console.log('Creating pagerduty incident');
   const data = {
@@ -116,6 +133,8 @@ const createPagerDutyIncident = async (name, description, channelId) => {
     .then((response) => response.data.incident.html_url);
 };
 
+// Create a page in Notion as a placeholder for the incident post-mortem doc.
+// If you're not using Notion, then feel free to delete.
 const createNotionIncidentPage = async (name, description, slackUrl) => {
   return notion.pages.create({
     parent: { database_id: NOTION_DB_ID },

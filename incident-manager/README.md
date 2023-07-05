@@ -3,6 +3,11 @@
 The incident manager is a small Slack app that powers the Airplane incident
 response process.
 
+As described in our [accompanying blog post](https://www.airplane.dev/blog),
+the code here is intended as a starting point for creating your own incident manager.
+You'll probably want to edit the messages and swap dependencies in or out
+(e.g., replacing Notion with your organization's document system of choice), among other customizations, before deploying it to production.
+
 ## Registering a new Slack app
 
 Before running the incident manager, you need to register it in the Slack developer UI.

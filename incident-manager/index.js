@@ -30,13 +30,16 @@ const SLACK_NOTIFY_CHANNEL_IDS = process.env.SLACK_NOTIFY_CHANNEL_IDS;
 // channel (optional)
 const SLACK_CC_GROUP_IDS = process.env.SLACK_CC_GROUP_IDS;
 
-// PagerDuty parameters.
+// PagerDuty parameters (optional). If you're not using PagerDuty, you can delete
+// these and the associated functions below.
 const PAGERDUTY_API_TOKEN = process.env.PAGERDUTY_API_TOKEN;
 const PAGERDUTY_ESCALATION_POLICY_ID =
   process.env.PAGERDUTY_ESCALATION_POLICY_ID;
 const PAGERDUTY_SERVICE_ID = process.env.PAGERDUTY_SERVICE_ID;
+const PAGERDUTY_REQUESTER_EMAIL = process.env.PAGERDUTY_REQUESTER_EMAIL;
 
-// Notion parameters.
+// Notion parameters (optional). If you're not using Notion, you can delete
+// these and the associated functions below.
 const NOTION_API_KEY = process.env.NOTION_API_KEY;
 const NOTION_DB_ID = process.env.NOTION_DB_ID;
 
@@ -54,10 +57,10 @@ const app = new bolt.App({
   socketMode: true,
 });
 
-// Create a pagerduty client
+// Create a PagerDuty client. If you're not using PagerDuty, you can delete this.
 const pd = pdApi({ token: PAGERDUTY_API_TOKEN });
 
-// Create a notion client
+// Create a Notion client. If you're not using Notion, you can delete this.
 const notion = new notionClient({ auth: NOTION_API_KEY });
 
 // Create an incident name from the current date plus a random adjective and noun
@@ -82,7 +85,6 @@ const createIncidentMarkdownDesc = (
   incidentSeverity,
   incidentChannelId,
   incidentCreatorId,
-  pagerdutyIncidentUrl
 ) => {
   const subteamMentions = SLACK_CC_GROUP_IDS.split(',').map((groupId) => {
     return `<!subteam^${groupId}>`;
@@ -95,7 +97,6 @@ const createIncidentMarkdownDesc = (
     `*Description:* ${incidentDescription}`,
     `*Created by:* <@${incidentCreatorId}>${incidentCC}`,
     `*Channel for more discussion:* <#${incidentChannelId}>`,
-    `*PagerDuty incident:* ${pagerdutyIncidentUrl}`,
   ];
 
   return lines.join('\n');
@@ -126,7 +127,7 @@ const createPagerDutyIncident = async (name, description, channelId) => {
   return pd
     .post('/incidents', {
       headers: {
-        From: 'yolken@airplane.dev',
+        From: PAGERDUTY_REQUESTER_EMAIL,
       },
       data: data,
     })
@@ -200,11 +201,13 @@ app.view('createIncidentView', async ({ ack, body, view, client, logger }) => {
   });
   const incidentChannelId = createChannelResp.channel.id;
 
-  const pdIncidentUrl = await createPagerDutyIncident(
-    incidentName,
-    incidentDescription,
-    incidentChannelId
-  );
+  if (PAGERDUTY_API_TOKEN) {
+    await createPagerDutyIncident(
+      incidentName,
+      incidentDescription,
+      incidentChannelId
+    );
+  }
 
   const markdownDesc = createIncidentMarkdownDesc(
     incidentName,
@@ -212,7 +215,6 @@ app.view('createIncidentView', async ({ ack, body, view, client, logger }) => {
     incidentSeverity,
     incidentChannelId,
     creatorId,
-    pdIncidentUrl
   );
 
   const promises = [];
@@ -283,14 +285,16 @@ app.view('createIncidentView', async ({ ack, body, view, client, logger }) => {
     })
   );
 
-  // Create notion page
-  promises.push(
-    createNotionIncidentPage(
-      incidentName,
-      incidentDescription,
-      `https://${SLACK_ORG}.slack.com/archives/${incidentChannelId}`
-    )
-  );
+  if (NOTION_API_KEY) {
+    // Create notion page
+    promises.push(
+      createNotionIncidentPage(
+        incidentName,
+        incidentDescription,
+        `https://${SLACK_ORG}.slack.com/archives/${incidentChannelId}`
+      )
+    );
+  }
 
   await Promise.all(promises);
   console.log('Incident successfully created');

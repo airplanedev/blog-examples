@@ -20,15 +20,15 @@ const SLACK_ORG = process.env.SLACK_ORG;
 
 // Comma-separated list of user IDs who should be invited to any incident
 // channels (optional)
-const SLACK_INVITE_USERS = process.env.SLACK_INVITE_USERS;
+const SLACK_INVITE_USERS = process.env.SLACK_INVITE_USERS || '';
 
 // Comma-separated list of channel IDs that should be notified about incidents
 // that occur (optional)
-const SLACK_NOTIFY_CHANNEL_IDS = process.env.SLACK_NOTIFY_CHANNEL_IDS;
+const SLACK_NOTIFY_CHANNEL_IDS = process.env.SLACK_NOTIFY_CHANNEL_IDS || '';
 
 // Comma-separated list of group IDs that should be cc'ed from the incident
 // channel (optional)
-const SLACK_CC_GROUP_IDS = process.env.SLACK_CC_GROUP_IDS;
+const SLACK_CC_GROUP_IDS = process.env.SLACK_CC_GROUP_ID || '';
 
 // PagerDuty parameters (optional). If you're not using PagerDuty, you can delete
 // these and the associated functions below.
@@ -84,7 +84,7 @@ const createIncidentMarkdownDesc = (
   incidentDescription,
   incidentSeverity,
   incidentChannelId,
-  incidentCreatorId,
+  incidentCreatorId
 ) => {
   const subteamMentions = SLACK_CC_GROUP_IDS.split(',').map((groupId) => {
     return `<!subteam^${groupId}>`;
@@ -214,7 +214,7 @@ app.view('createIncidentView', async ({ ack, body, view, client, logger }) => {
     incidentDescription,
     incidentSeverity,
     incidentChannelId,
-    creatorId,
+    creatorId
   );
 
   const promises = [];

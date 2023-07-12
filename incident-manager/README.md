@@ -52,3 +52,6 @@ creating PagerDuty incidents and Notion post-mortem docs.
 We've provided a `Dockerfile` that can be used to create an image for the
 incident manager tool. Once this is built, you can deploy it in your environment
 of choice.
+
+The resulting container needs outbound access to the Internet (so it can hit
+external HTTPS endpoints), but does not receive any requests from the outside.

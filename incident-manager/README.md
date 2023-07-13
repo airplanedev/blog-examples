@@ -20,12 +20,12 @@ Here are the basic steps:
 4. Select "Slash Commands" in the left-hand menu and create two commands, `/incident`
    and `/resolve-incident`
 5. Select "OAuth & Permissions" in the left-hand menu and add the following scopes:
-   a. `bookmarks:write`
-   b. `channels:manage`
-   c. `channels:read`
-   d. `chat:write`
-   e. `commands`
-   f. `users:read`
+   1. `bookmarks:write`
+   2. `channels:manage`
+   3. `channels:read`
+   4. `chat:write`
+   5. `commands`
+   6. `users:read`
 6. In the same page, select "Install to Workspace"; copy down the "Bot User OAuth Token"
    string that's shown after doing the install
 7. Select "Basic Information" from the left-hand menu, then select your token in the

@@ -1,0 +1,21 @@
+{
+  "name": "slack-incident-manager",
+  "version": "1.0.0",
+  "description": "Create a Slack incident from a slash command",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "supervisor index.js",
+    "build": "ncc build index.js"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.5",
+    "@pagerduty/pdjs": "^2.2.4",
+    "@slack/bolt": "^3.12.1"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.34.0",
+    "prettier": "^2.8.8",
+    "supervisor": "^0.12.0"
+  }
+}
